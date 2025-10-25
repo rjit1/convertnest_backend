@@ -8,6 +8,7 @@ Production-ready Node.js/Express backend for ConvertNest PDF tools with auto-cle
 - **Merge PDFs** - Combine multiple PDF files into a single document
 - **Split PDFs** - Separate PDF into individual page files
 - **Reorder PDF Pages** - Rearrange pages in any order
+- **Image to PDF** - Convert 13 image formats (JPG, PNG, WEBP, GIF, BMP, TIFF, AVIF, HEIC, HEIF, SVG) to PDF with customizable settings
 - **Auto-Cleanup** - Automatically delete files older than 24 hours
 - **Rate Limiting** - Prevent abuse with configurable rate limits
 - **Comprehensive Logging** - Winston logger with file rotation
@@ -20,6 +21,7 @@ Production-ready Node.js/Express backend for ConvertNest PDF tools with auto-cle
 - Node.js 20.x or higher
 - npm 9.x or higher
 - Ubuntu 22.04 LTS (for DigitalOcean deployment)
+- **Sharp** image processing library (for Image to PDF multi-format support)
 
 ## 🛠️ Installation
 
@@ -312,7 +314,55 @@ Field: pageOrder (JSON array, e.g., [3,1,2])
 
 ---
 
-#### 5. Get PDF Info
+#### 5. Image to PDF Conversion
+```http
+POST /api/image-to-pdf
+Content-Type: multipart/form-data
+
+Fields:
+  - images: File[] (required, up to 50 images)
+  - pageSize: string (optional, default: 'a4') - 'a4', 'letter', 'legal'
+  - orientation: string (optional, default: 'portrait') - 'portrait', 'landscape'
+  - fitMode: string (optional, default: 'fit') - 'fit', 'fill', 'actual'
+  - margin: number (optional, default: 20) - Margin in points (0-100)
+  - quality: number (optional, default: 90) - Quality 0-100
+```
+
+**Supported Image Formats** (13 formats):
+- **Native**: JPG, JPEG, PNG
+- **Modern Web**: WebP, AVIF  
+- **Mobile**: HEIC, HEIF (iPhone photos)
+- **Professional**: TIFF, BMP
+- **Animation**: GIF (first frame)
+- **Vector**: SVG (rasterized at 300 DPI)
+
+**Response:** Downloads PDF file with images as pages
+
+**Example (cURL):**
+```bash
+# Single image
+curl -X POST https://api.convertnest.tech/api/image-to-pdf \
+  -F "images=@photo.jpg" \
+  -F "pageSize=a4" \
+  -o output.pdf
+
+# Multiple images with settings
+curl -X POST https://api.convertnest.tech/api/image-to-pdf \
+  -F "images=@photo1.jpg" \
+  -F "images=@photo2.png" \
+  -F "images=@iphone_photo.heic" \
+  -F "images=@modern_image.webp" \
+  -F "images=@logo.svg" \
+  -F "pageSize=letter" \
+  -F "orientation=landscape" \
+  -F "fitMode=fit" \
+  -F "margin=20" \
+  -o combined.pdf
+```
+
+---
+
+#### 6. Get PDF Info
 ```http
 POST /api/pdf-info
 Content-Type: multipart/form-data
@@ -324,7 +374,7 @@ Field: pdf (file)
 
 ---
 
-#### 6. Health Check
+#### 7. Health Check
 ```http
 GET /api/health
 ```
@@ -344,7 +394,7 @@ GET /api/health
 
 ---
 
-#### 7. Upload Statistics
+#### 8. Upload Statistics
 ```http
 GET /api/stats
 ```

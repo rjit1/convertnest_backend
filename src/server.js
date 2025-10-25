@@ -13,6 +13,7 @@ const { initializeCleanupService } = require('./services/cleanupService');
 const pdfRoutes = require('./routes/pdfRoutes');
 const mergeRoutes = require('./routes/mergeRoutes');
 const currencyRoutes = require('./routes/currencyRoutes');
+const imageToPdfRoutes = require('./routes/imageToPdfRoutes');
 const utilityRoutes = require('./routes/utilityRoutes');
 
 // Initialize Express app
@@ -70,6 +71,7 @@ app.use('/api/', limiter);
 app.use('/api', pdfRoutes);
 app.use('/api', mergeRoutes);
 app.use('/api/currency', currencyRoutes);
+app.use('/api', imageToPdfRoutes);
 app.use('/api', utilityRoutes);
 
 // Root endpoint
@@ -84,6 +86,7 @@ app.get('/', (req, res) => {
       mergePdfs: 'POST /api/merge-pdfs',
       splitPdf: 'POST /api/split-pdf',
       reorderPdf: 'POST /api/reorder-pdf',
+      imageToPdf: 'POST /api/image-to-pdf',
       health: 'GET /api/health',
       stats: 'GET /api/stats'
     },

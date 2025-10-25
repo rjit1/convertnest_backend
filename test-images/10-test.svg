@@ -1,0 +1,20 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-svg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e74c3c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c0392b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#grad-svg)"/>
+  <circle cx="400" cy="300" r="150" fill="none" stroke="white" stroke-width="10" opacity="0.3"/>
+  <text x="400" y="250" font-family="Arial" font-size="56" fill="white" text-anchor="middle" font-weight="bold">
+    SVG Format
+  </text>
+  <text x="400" y="320" font-family="Arial" font-size="32" fill="white" text-anchor="middle">
+    Vector Graphics
+  </text>
+  <text x="400" y="380" font-family="Arial" font-size="24" fill="rgba(255,255,255,0.8)" text-anchor="middle">
+    Scalable • No Pixels
+  </text>
+  <path d="M 200 450 Q 400 350 600 450" fill="none" stroke="white" stroke-width="5" opacity="0.5"/>
+</svg>

@@ -155,41 +155,96 @@ nginx -v
 
 ## 4. Deploy Backend Application
 
-### Step 4.1: Upload Your Code
+### Step 4.1: Clone Your Backend from GitHub
 
-**Option A: Using Git (RECOMMENDED)**
+**Your backend is already on GitHub at:** `https://github.com/rjit1/multitool_website`
 
-1. Push your code to GitHub (if not already):
-   ```powershell
-   # On your local machine
-   cd E:\tool\convertnest-backend
-   git init
-   git add .
-   git commit -m "Initial commit"
-   gh repo create convertnest-backend --private
-   git push -u origin main
-   ```
+```bash
+# Navigate to home directory
+cd /home/deployer
 
-2. Clone on server:
+# Clone the repository
+git clone https://github.com/rjit1/multitool_website.git
+
+# Navigate to backend directory
+cd multitool_website/convertnest-backend
+
+# Verify files are present
+ls -la
+```
+
+**Expected output:**
+```
+.env.example
+package.json
+README.md
+src/
+uploads/
+logs/
+...
+```
+
+**Note:** If the repository is private, you'll need to authenticate:
+
+**Option 1: Personal Access Token (Recommended)**
+1. Go to GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Click "Generate new token (classic)"
+3. Name it "DigitalOcean Backend Deployment"
+4. Select scope: `repo` (Full control of private repositories)
+5. Click "Generate token"
+6. **Copy the token** (you won't see it again!)
+7. When cloning, use:
    ```bash
-   cd /home/deployer
-   git clone https://github.com/YOUR_USERNAME/convertnest-backend.git
-   cd convertnest-backend
+   git clone https://YOUR_TOKEN@github.com/rjit1/multitool_website.git
    ```
 
-**Option B: Using SCP (Direct Upload)**
+**Option 2: SSH Key (Advanced)**
+```bash
+# Generate SSH key on server
+ssh-keygen -t ed25519 -C "your_email@example.com"
 
-```powershell
-# On your local machine (PowerShell)
-scp -r E:\tool\convertnest-backend deployer@YOUR_DROPLET_IP:/home/deployer/
+# Display public key
+cat ~/.ssh/id_ed25519.pub
+
+# Copy the output and add to GitHub → Settings → SSH and GPG keys → New SSH key
+
+# Clone using SSH
+git clone git@github.com:rjit1/multitool_website.git
 ```
 
 ### Step 4.2: Install Dependencies
 
 ```bash
-cd /home/deployer/convertnest-backend
+# Make sure you're in the backend directory
+cd /home/deployer/multitool_website/convertnest-backend
+
+# Install all production dependencies
 npm install --production
 ```
+
+**Expected output:**
+```
+added 150 packages, and audited 151 packages in 15s
+
+23 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+```
+
+**This will install all required packages:**
+- express (4.21.2)
+- axios (1.7.9) - For Currency API
+- pdf-parse (2.4.5) - For PDF to Word
+- pdf-lib (1.17.1) - For Merge PDFs
+- docx (9.5.1) - For Word document creation
+- multer (1.4.5-lts.1) - File uploads
+- winston (3.17.0) - Logging
+- helmet (8.0.0) - Security
+- cors (2.8.5) - CORS handling
+- express-rate-limit (7.5.0) - Rate limiting
+- node-cron (3.0.3) - Cleanup scheduling
+- compression (1.7.5) - Response compression
 
 ### Step 4.3: Create Production Environment File
 
@@ -227,8 +282,23 @@ Press `Ctrl+X`, then `Y`, then `Enter` to save
 ### Step 4.4: Create Required Directories
 
 ```bash
+# Make sure you're in the backend directory
+cd /home/deployer/multitool_website/convertnest-backend
+
+# Create directories (they might already exist from Git)
 mkdir -p uploads logs
+
+# Set proper permissions
 chmod 755 uploads logs
+
+# Verify directories exist
+ls -la | grep -E "uploads|logs"
+```
+
+**Expected output:**
+```
+drwxr-xr-x  2 deployer deployer  4096 Oct 24 10:30 logs
+drwxr-xr-x  2 deployer deployer  4096 Oct 24 10:30 uploads
 ```
 
 ### Step 4.5: Test the Application
@@ -253,7 +323,38 @@ Press `Ctrl+C` to stop (we'll use PM2 next)
 ### Step 5.1: Start Application with PM2
 
 ```bash
+# Navigate to backend directory
+cd /home/deployer/multitool_website/convertnest-backend
+
+# Start the application with PM2
 pm2 start src/server.js --name convertnest-backend
+
+# You can also use npm start script
+# pm2 start npm --name convertnest-backend -- start
+```
+
+**Expected output:**
+```
+[PM2] Starting /home/deployer/multitool_website/convertnest-backend/src/server.js in fork_mode (1 instance)
+[PM2] Done.
+┌─────┬────────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id  │ name                   │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├─────┼────────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 0   │ convertnest-backend    │ default     │ 1.0.0   │ fork    │ 12345    │ 0s     │ 0    │ online    │ 0%       │ 50.0mb   │ deployer │ disabled │
+└─────┴────────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+```
+
+**Verify it's running:**
+```bash
+pm2 status
+pm2 logs convertnest-backend --lines 20
+```
+
+**You should see in logs:**
+```
+🚀 ConvertNest Backend API started successfully
+📍 Server running on port 3000
+🌍 Environment: production
 ```
 
 ### Step 5.2: Configure Auto-Restart on Reboot
@@ -621,24 +722,76 @@ df -h
 
 ### When You Make Code Changes:
 
+**On your local machine (Windows):**
+
+```powershell
+# Navigate to backend directory
+cd E:\tool\convertnest-backend
+
+# Make your changes, then commit and push
+git add .
+git commit -m "Description of changes"
+git push origin main
+```
+
+**On your server (DigitalOcean droplet):**
+
 ```bash
 # SSH into server
 ssh deployer@YOUR_DROPLET_IP
 
 # Navigate to app directory
-cd /home/deployer/convertnest-backend
+cd /home/deployer/multitool_website/convertnest-backend
 
-# Pull latest changes
+# Pull latest changes from GitHub
 git pull origin main
 
-# Install new dependencies (if any)
+# Install new dependencies (if package.json changed)
 npm install --production
 
-# Restart application
-pm2 restart convertnest-backend
+# Restart application with zero downtime
+pm2 reload convertnest-backend
 
-# Monitor logs
-pm2 logs convertnest-backend
+# Or hard restart if needed
+# pm2 restart convertnest-backend
+
+# Monitor logs to ensure everything works
+pm2 logs convertnest-backend --lines 50
+```
+
+**Expected output after pull:**
+```
+Updating abc1234..def5678
+Fast-forward
+ src/controllers/newController.js | 45 +++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+```
+
+**Pro tip:** You can automate this with a deployment script:
+
+```bash
+# Create deployment script
+nano ~/deploy.sh
+```
+
+Add this content:
+```bash
+#!/bin/bash
+cd /home/deployer/multitool_website/convertnest-backend
+echo "📥 Pulling latest changes..."
+git pull origin main
+echo "📦 Installing dependencies..."
+npm install --production
+echo "🔄 Restarting application..."
+pm2 reload convertnest-backend
+echo "✅ Deployment complete!"
+pm2 status
+```
+
+Make it executable and use:
+```bash
+chmod +x ~/deploy.sh
+~/deploy.sh
 ```
 
 ---
@@ -690,28 +843,175 @@ sudo ufw status
 
 ---
 
-##  Deployment Checklist
+## ✅ Deployment Checklist
 
-- [ ] DigitalOcean droplet created (2GB/2vCPUs)
+### Pre-Deployment (On Your Computer)
+- [x] Backend code pushed to GitHub (https://github.com/rjit1/multitool_website)
+- [x] All dependencies listed in package.json
+- [x] .env.example file created
+- [ ] DigitalOcean account created
+- [ ] Domain name purchased (or using existing)
+
+### Droplet Setup (Steps 1-3)
+- [ ] DigitalOcean droplet created (2GB RAM, 2 vCPUs, Ubuntu 22.04)
 - [ ] SSH access configured
-- [ ] Non-root user created
-- [ ] Node.js 20 LTS installed
-- [ ] Git installed
-- [ ] PM2 installed
-- [ ] Nginx installed
-- [ ] Backend code uploaded
-- [ ] Dependencies installed (npm install)
+- [ ] Droplet IP address noted: ________________
+- [ ] Non-root user created (deployer)
+- [ ] System updated (apt update && upgrade)
+
+### Software Installation (Step 3)
+- [ ] Node.js 20 LTS installed (`node -v` shows v20.x.x)
+- [ ] npm installed (`npm -v` shows v10.x.x)
+- [ ] Git installed (`git --version` works)
+- [ ] PM2 installed globally (`pm2 -v` works)
+- [ ] Nginx installed (`nginx -v` works)
+
+### Backend Deployment (Step 4)
+- [ ] Repository cloned: `/home/deployer/multitool_website/convertnest-backend`
+- [ ] Dependencies installed (`npm install --production`)
 - [ ] Production .env file created
-- [ ] PM2 process running
-- [ ] PM2 auto-start configured
-- [ ] Nginx reverse proxy configured
-- [ ] DNS A record added (api.convertnest.tech)
-- [ ] SSL certificate installed (HTTPS)
-- [ ] Firewall configured (UFW)
-- [ ] Backend API tested
-- [ ] Frontend updated with production API URL
-- [ ] Frontend deployed to Vercel
-- [ ] Monitoring setup complete
+- [ ] ExchangeRate API key added to .env
+- [ ] ALLOWED_ORIGINS set to production domain
+- [ ] NODE_ENV=production in .env
+- [ ] uploads/ and logs/ directories created
+- [ ] Test run successful (`npm start` works)
+
+### PM2 Configuration (Step 5)
+- [ ] PM2 process started (`pm2 start src/server.js --name convertnest-backend`)
+- [ ] PM2 startup configured (`pm2 startup systemd`)
+- [ ] PM2 process list saved (`pm2 save`)
+- [ ] Application visible in `pm2 list`
+- [ ] Logs show "Server running on port 3000"
+
+### Nginx Setup (Step 6)
+- [ ] Nginx config created: `/etc/nginx/sites-available/api.convertnest.tech`
+- [ ] Proxy settings configured (localhost:3000)
+- [ ] Security headers added
+- [ ] Upload size set to 100M
+- [ ] Site enabled (symlink to sites-enabled)
+- [ ] Nginx config test passed (`sudo nginx -t`)
+- [ ] Nginx reloaded
+
+### DNS Configuration (Step 7)
+- [ ] A record created: api.convertnest.tech → Droplet IP
+- [ ] TTL set to 300 seconds (5 minutes)
+- [ ] DNS propagation complete (15-30 min wait)
+- [ ] `ping api.convertnest.tech` shows correct IP
+
+### SSL Certificate (Step 8)
+- [ ] Certbot installed via snap
+- [ ] SSL certificate obtained (`sudo certbot --nginx -d api.convertnest.tech`)
+- [ ] Certificate files created in /etc/letsencrypt/live/
+- [ ] Nginx auto-configured for HTTPS
+- [ ] Auto-renewal test passed (`sudo certbot renew --dry-run`)
+
+### Firewall Security (Step 9)
+- [ ] OpenSSH allowed (`sudo ufw allow OpenSSH`)
+- [ ] Nginx Full allowed (`sudo ufw allow 'Nginx Full'`)
+- [ ] UFW enabled (`sudo ufw enable`)
+- [ ] Status verified (`sudo ufw status`)
+
+### Testing & Verification (Step 10)
+- [ ] Health check works: `curl https://api.convertnest.tech/api/health`
+- [ ] Currency API works: `curl https://api.convertnest.tech/api/currency/supported`
+- [ ] PDF to Word endpoint accessible
+- [ ] Merge PDFs endpoint accessible
+- [ ] No errors in PM2 logs
+- [ ] No errors in Nginx logs
+
+### Frontend Integration (Step 10.4)
+- [ ] Frontend .env.local updated: `NEXT_PUBLIC_API_URL=https://api.convertnest.tech`
+- [ ] Environment variable added to Vercel dashboard
+- [ ] Frontend redeployed to Vercel
+- [ ] CORS working between frontend and backend
+- [ ] All 20 tools tested from production frontend
+- [ ] PDF to Word tool working
+- [ ] Merge PDFs tool working
+- [ ] Currency Converter tool working
+
+### Post-Deployment
+- [ ] PM2 monitoring setup (`pm2 monit`)
+- [ ] Log rotation configured
+- [ ] Deployment script created (~/deploy.sh)
+- [ ] Documentation updated
+- [ ] Team notified of deployment
+- [ ] API endpoint documentation shared
+- [ ] Monitoring alerts configured (optional)
+
+### Final Verification
+- [ ] Backend: https://api.convertnest.tech/api/health returns success
+- [ ] Frontend: https://www.convertnest.tech loads correctly
+- [ ] All 20 tools functional on production
+- [ ] File uploads working
+- [ ] Currency conversion real-time updates working
+- [ ] Auto-cleanup service running (check after 24 hours)
+- [ ] SSL certificate valid (check in browser)
+- [ ] No mixed content warnings
+- [ ] Mobile responsive working
+
+---
+
+## 📋 Deployment Information Sheet
+
+**Fill this out as you deploy:**
+
+```
+Deployment Date: _____________________
+Deployed By: _____________________
+
+DROPLET INFORMATION:
+- IP Address: _____________________
+- Hostname: convertnest-api
+- Region: _____________________
+- Size: 2GB RAM / 2 vCPUs
+- Cost: $18/month
+
+DOMAIN CONFIGURATION:
+- Backend Domain: api.convertnest.tech
+- Frontend Domain: www.convertnest.tech
+- DNS Provider: _____________________
+- A Record IP: _____________________
+
+ACCESS INFORMATION:
+- SSH User: deployer
+- SSH Command: ssh deployer@_____________________
+- GitHub Repo: https://github.com/rjit1/multitool_website
+- Backend Path: /home/deployer/multitool_website/convertnest-backend
+
+API KEYS:
+- ExchangeRate API Key: 761b4a8979e49eaf282165b2
+- API Limit: 1,500 requests/month
+- Google Analytics: G-39QHHGSKYM
+
+SSL CERTIFICATE:
+- Provider: Let's Encrypt
+- Expiry: _____________________ (90 days from installation)
+- Auto-renewal: Enabled
+- Next renewal check: _____________________
+
+PM2 PROCESS:
+- Name: convertnest-backend
+- Port: 3000 (internal)
+- Status: Check with `pm2 status`
+- Logs: Check with `pm2 logs convertnest-backend`
+
+MONITORING:
+- PM2 Dashboard: pm2 monit
+- Nginx Logs: /var/log/nginx/api.convertnest.tech.access.log
+- Backend Logs: /home/deployer/multitool_website/convertnest-backend/logs/
+- Uptime Monitor: _____________________ (optional service)
+
+BACKUP STRATEGY:
+- Code: GitHub (automatic)
+- Database: N/A (stateless API)
+- Uploads: Auto-deleted after 24 hours
+- Logs: Rotated by Winston
+
+NOTES:
+_____________________
+_____________________
+_____________________
+```
 
 ---
 
