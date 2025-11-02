@@ -15,6 +15,7 @@ const mergeRoutes = require('./routes/mergeRoutes');
 const currencyRoutes = require('./routes/currencyRoutes');
 const imageToPdfRoutes = require('./routes/imageToPdfRoutes');
 const utilityRoutes = require('./routes/utilityRoutes');
+const captionRoutes = require('./routes/captionRoutes');
 
 // Initialize Express app
 const app = express();
@@ -72,6 +73,7 @@ app.use('/api', pdfRoutes);
 app.use('/api', mergeRoutes);
 app.use('/api/currency', currencyRoutes);
 app.use('/api', imageToPdfRoutes);
+app.use('/api', captionRoutes);
 app.use('/api', utilityRoutes);
 
 // Root endpoint
