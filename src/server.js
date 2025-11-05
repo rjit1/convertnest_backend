@@ -16,6 +16,7 @@ const currencyRoutes = require('./routes/currencyRoutes');
 const imageToPdfRoutes = require('./routes/imageToPdfRoutes');
 const utilityRoutes = require('./routes/utilityRoutes');
 const captionRoutes = require('./routes/captionRoutes');
+const imageToExcelRoutes = require('./routes/imageToExcel');
 
 // Initialize Express app
 const app = express();
@@ -37,7 +38,8 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
+  exposedHeaders: ['X-Processing-Time', 'X-Extraction-Method', 'X-Table-Preview', 'Content-Disposition']
 }));
 
 // Compression middleware
@@ -74,6 +76,7 @@ app.use('/api', mergeRoutes);
 app.use('/api/currency', currencyRoutes);
 app.use('/api', imageToPdfRoutes);
 app.use('/api', captionRoutes);
+app.use('/api', imageToExcelRoutes);
 app.use('/api', utilityRoutes);
 
 // Root endpoint
@@ -89,6 +92,8 @@ app.get('/', (req, res) => {
       splitPdf: 'POST /api/split-pdf',
       reorderPdf: 'POST /api/reorder-pdf',
       imageToPdf: 'POST /api/image-to-pdf',
+      imageToExcel: 'POST /api/image-to-excel/convert',
+      captionGenerator: 'POST /api/caption-generator',
       health: 'GET /api/health',
       stats: 'GET /api/stats'
     },
@@ -130,7 +135,8 @@ process.on('SIGINT', () => {
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   logger.error('Unhandled Promise Rejection:', err);
-  process.exit(1);
+  // Don't exit immediately - log and continue
+  // process.exit(1);
 });
 
 module.exports = app;

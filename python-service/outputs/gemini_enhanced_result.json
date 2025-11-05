@@ -1,0 +1,184 @@
+{
+  "table_metadata": {
+    "total_rows": 18,
+    "total_columns": 7,
+    "total_cells": 126,
+    "cells_with_content": 121,
+    "extraction_confidence": "high",
+    "table_type": "ledger"
+  },
+  "column_headers": [
+    "S.No.",
+    "Name",
+    "Code",
+    "MPP",
+    "Best Price",
+    "Quantity",
+    "Total"
+  ],
+  "table_data": [
+    [
+      "20.",
+      "Avery eu hand care",
+      "61W 7988",
+      "7300",
+      "1955",
+      "1",
+      "1955"
+    ],
+    [
+      "21.",
+      "A2 PEPPE yaimly",
+      "180",
+      "300",
+      "150",
+      "15",
+      "2250"
+    ],
+    [
+      "22.",
+      "CT Naruto Samuray",
+      "CHT 2800",
+      "4500",
+      "2750",
+      "2",
+      "5500"
+    ],
+    [
+      "23.",
+      "000.01 sg super Monster",
+      "D58 1294",
+      "2000",
+      "1000",
+      "6",
+      "6000"
+    ],
+    [
+      "24.",
+      "GN Marvel Iron man",
+      "3D8 1949",
+      "1290",
+      "1110",
+      "3+5+1",
+      "11100"
+    ],
+    [
+      "25.",
+      "GN Marvel black Panther",
+      "3D8 1949",
+      "1290",
+      "1110",
+      "7",
+      "7770"
+    ],
+    [
+      "26.",
+      "Marvel action figure",
+      "5H8 1949",
+      "1290",
+      "1110",
+      "1",
+      "1110"
+    ],
+    [
+      "27.",
+      "WWE wrestler",
+      "5X8 2700",
+      "5000",
+      "2500",
+      "5",
+      "12500"
+    ],
+    [
+      "28.",
+      "Naruto Bros set",
+      "UHT 1187",
+      "2000",
+      "1000",
+      "5",
+      "5000"
+    ],
+    [
+      "29.",
+      "PEPPA PG",
+      "1322",
+      "2100",
+      "1050",
+      "4",
+      "4200"
+    ],
+    [
+      "30.",
+      "Woody Hoopy 9423",
+      "2J7 2300",
+      "3000",
+      "1500",
+      "2",
+      "01/11/23 3000"
+    ],
+    [
+      "31.",
+      "WWE wrestler",
+      "578 1500",
+      "2800",
+      "1400",
+      "5",
+      "7000"
+    ],
+    [
+      "32.",
+      "KT Peppa Pig PP605. 11 pcs",
+      "1322",
+      "2100",
+      "1050",
+      "1",
+      "1050"
+    ],
+    [
+      "33.",
+      "R. Peppa Pig PP605",
+      "FGA 2300",
+      "4000",
+      "2000",
+      "5",
+      "1000"
+    ],
+    [
+      "34.",
+      "Magnetic stick",
+      "1680",
+      "3000",
+      "1500",
+      "1",
+      "1500"
+    ],
+    [
+      "35.",
+      "R500 15 Iron man",
+      "2182700",
+      "5000",
+      "2500",
+      "6",
+      "15000"
+    ],
+    [
+      "36.",
+      "R. Lago Guy",
+      "205 1605",
+      "8200",
+      "1600",
+      "4",
+      "6400"
+    ],
+    [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "79",
+      "92335"
+    ]
+  ],
+  "extraction_notes": "Handwriting is generally clear. Several calculation discrepancies were observed between 'Best Price * Quantity' and 'Total' column values (specifically for S.No. 24 and S.No. 33). Discrepancies found in the summary row totals for 'Quantity' and 'Total' columns when manually summing the individual rows. Cell for S.No. 30, 'Total' column, has a date '01/11/23' written over the number '3000'. Cell for S.No. 31, 'Total' column, has a scribble/signature over the number '7000'. Cell for S.No. 24, 'Quantity' column, contains an arithmetic expression '3+5+1'."
+}
