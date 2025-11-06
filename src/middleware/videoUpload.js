@@ -49,14 +49,35 @@ const mediaFileFilter = (req, file, cb) => {
 
   const allowedMimes = [...allowedImageMimes, ...allowedVideoMimes];
 
+  // Check MIME type first
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
-  } else {
-    cb(new AppError(
-      `Invalid file type: ${file.mimetype}. Supported formats: JPG, PNG, WebP, GIF, BMP, TIFF, AVIF, HEIC, MP4, MOV, WebM`,
-      400
-    ), false);
+    return;
   }
+
+  // If MIME type is application/octet-stream, check file extension
+  // This handles cases where browsers/curl don't send correct MIME type
+  if (file.mimetype === 'application/octet-stream') {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const allowedExtensions = [
+      // Images
+      '.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tiff', '.tif', '.avif', '.heic', '.heif',
+      // Videos
+      '.mp4', '.mov', '.webm', '.avi', '.mkv'
+    ];
+    
+    if (allowedExtensions.includes(ext)) {
+      logger.debug(`Accepting file with octet-stream MIME type based on extension: ${ext}`);
+      cb(null, true);
+      return;
+    }
+  }
+
+  // Reject file
+  cb(new AppError(
+    `Invalid file type: ${file.mimetype}. Supported formats: JPG, PNG, WebP, GIF, BMP, TIFF, AVIF, HEIC, MP4, MOV, WebM`,
+    400
+  ), false);
 };
 
 // Create multer instance with large file support
