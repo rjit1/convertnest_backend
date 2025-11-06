@@ -25,10 +25,7 @@ const PORT = process.env.PORT || 3000;
 // Trust proxy (required for rate limiting and CORS behind Nginx)
 app.set('trust proxy', 1);
 
-// Security middleware
-app.use(helmet());
-
-// CORS configuration
+// CORS configuration (MUST be before helmet)
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',');
 app.use(cors({
   origin: (origin, callback) => {
@@ -43,6 +40,11 @@ app.use(cors({
   },
   credentials: true,
   exposedHeaders: ['X-Processing-Time', 'X-Extraction-Method', 'X-Table-Preview', 'Content-Disposition']
+}));
+
+// Security middleware (MUST be after CORS)
+app.use(helmet({
+  crossOriginResourcePolicy: false, // Don't block CORS
 }));
 
 // Compression middleware
