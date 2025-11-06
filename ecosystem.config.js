@@ -9,7 +9,7 @@ module.exports = {
     {
       name: 'convertnest-api',
       script: './src/server.js',
-      cwd: '/var/www/convertnest-backend',
+      cwd: '/home/convertnest/convertnest-backend',
       instances: 1,
       autorestart: true,
       watch: false,
@@ -28,9 +28,9 @@ module.exports = {
     // Python Gemini Service for Image-to-Excel
     {
       name: 'python-gemini-service',
-      script: '/var/www/convertnest-backend/python-service/.venv/bin/python',
+      script: '/home/convertnest/convertnest-backend/python-service/.venv/bin/python',
       args: 'app.py',
-      cwd: '/var/www/convertnest-backend/python-service',
+      cwd: '/home/convertnest/convertnest-backend/python-service',
       interpreter: 'none',
       instances: 1,
       autorestart: true,
@@ -38,7 +38,7 @@ module.exports = {
       max_memory_restart: '500M',
       env: {
         PORT: 5000,
-        GEMINI_API_KEY: 'AIzaSyBUh0SBKjsm2c530wUxMrIIljiTyF9a-kA',
+        GEMINI_API_KEY: 'AIzaSyBLiAbshEJYh27e8kozDhQvAHfXc6n411E',
         DEBUG: 'False',
         LOG_LEVEL: 'INFO',
         MAX_FILE_SIZE_MB: 10
