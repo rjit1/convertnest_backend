@@ -23,8 +23,8 @@ Lower Impact Parameters (Hidden/Auto):
 - System Instructions: Auto-generated based on voice
 """
 
-import google.generativeai as genai
-from google.generativeai import types
+from google import genai
+from google.genai import types
 import wave
 import os
 import logging
@@ -126,8 +126,8 @@ class GeminiTTSService:
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY environment variable is required")
         
-        genai.configure(api_key=self.api_key)
-        self.model_name = "gemini-2.5-pro-preview-tts"
+        self.client = genai.Client(api_key=self.api_key)
+        self.model_name = "gemini-2.5-flash-preview-tts"  # Use Flash for faster generation
         
         logger.info(f"✓ Gemini TTS Service initialized: {self.model_name}")
         logger.info(f"  - {len(self.VOICES)} voices available")
@@ -176,24 +176,20 @@ class GeminiTTSService:
             
             logger.info(f"🎤 Generating speech: {len(text)} chars, voice={voice_name}, lang={language_code}")
             
-            # Use GenerativeModel API (google-generativeai v0.8.5)
-            # Language is AUTO-DETECTED from input text - don't specify language_code!
-            # Pass generation_config to generate_content() instead of constructor for better compatibility
-            model = genai.GenerativeModel(model_name=self.model_name)
-            
-            response = model.generate_content(
-                full_text,
-                generation_config={
-                    'temperature': temperature,
-                    'response_modalities': ['AUDIO'],
-                    'speech_config': {
-                        'voice_config': {
-                            'prebuilt_voice_config': {
-                                'voice_name': voice_name
-                            }
-                        }
-                    }
-                }
+            # Use NEW Google Gen AI SDK with correct TTS format
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=full_text,
+                config=types.GenerateContentConfig(
+                    response_modalities=['AUDIO'],
+                    speech_config=types.SpeechConfig(
+                        voice_config=types.VoiceConfig(
+                            prebuilt_voice_config=types.PrebuiltVoiceConfig(
+                                voice_name=voice_name
+                            )
+                        )
+                    )
+                )
             )
             
             # Debug: Check response structure
@@ -302,37 +298,36 @@ class GeminiTTSService:
             
             logger.info(f"🎭 Generating dialog: {len(speakers)} speakers, {len(transcript)} chars")
             
-            # Build speaker configs as dicts (v0.8.5 format)
-            speaker_configs = []
+            # Build speaker configs using NEW SDK types
+            speaker_voice_configs = []
             for speaker in speakers:
                 voice_name = speaker.get('voice', 'Kore')
                 if voice_name not in self.VOICES:
                     voice_name = 'Kore'
                 
-                speaker_configs.append({
-                    'speaker': speaker.get('name', f"Speaker{len(speaker_configs)+1}"),
-                    'voice_config': {
-                        'prebuilt_voice_config': {
-                            'voice_name': voice_name
-                        }
-                    }
-                })
+                speaker_voice_configs.append(
+                    types.SpeakerVoiceConfig(
+                        speaker=speaker.get('name', f"Speaker{len(speaker_voice_configs)+1}"),
+                        voice_config=types.VoiceConfig(
+                            prebuilt_voice_config=types.PrebuiltVoiceConfig(
+                                voice_name=voice_name
+                            )
+                        )
+                    )
+                )
             
-            # Use GenerativeModel API - language is AUTO-DETECTED
-            # Pass generation_config to generate_content() for better compatibility
-            model = genai.GenerativeModel(model_name=self.model_name)
-            
-            response = model.generate_content(
-                transcript,
-                generation_config={
-                    'temperature': temperature,
-                    'response_modalities': ['AUDIO'],
-                    'speech_config': {
-                        'multi_speaker_voice_config': {
-                            'speaker_voice_configs': speaker_configs
-                        }
-                    }
-                }
+            # Use NEW Google Gen AI SDK for dialog
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=transcript,
+                config=types.GenerateContentConfig(
+                    response_modalities=['AUDIO'],
+                    speech_config=types.SpeechConfig(
+                        multi_speaker_voice_config=types.MultiSpeakerVoiceConfig(
+                            speaker_voice_configs=speaker_voice_configs
+                        )
+                    )
+                )
             )
             
             # Extract and save audio
