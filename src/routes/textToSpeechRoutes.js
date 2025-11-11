@@ -79,7 +79,7 @@ router.post('/text-to-speech/generate', async (req, res, next) => {
       },
       {
         responseType: 'stream',
-        timeout: 60000 // 60s timeout
+        timeout: 180000 // 3 minutes timeout (TTS can be slow for long text)
       }
     );
     
@@ -144,7 +144,7 @@ router.post('/text-to-speech/generate-dialog', async (req, res, next) => {
       },
       {
         responseType: 'stream',
-        timeout: 60000
+        timeout: 180000 // 3 minutes timeout (TTS can be slow for long text)
       }
     );
     
