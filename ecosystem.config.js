@@ -38,7 +38,7 @@ module.exports = {
       max_memory_restart: '500M',
       env: {
         PORT: 5000,
-        GEMINI_API_KEY: 'AIzaSyBLiAbshEJYh27e8kozDhQvAHfXc6n411E',
+        GEMINI_API_KEY: 'AIzaSyD5PGAou3FpuCASRTi1f993TFd_XQd4NGI',
         DEBUG: 'False',
         LOG_LEVEL: 'INFO',
         MAX_FILE_SIZE_MB: 10

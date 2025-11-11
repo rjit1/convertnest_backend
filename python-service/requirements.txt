@@ -12,5 +12,9 @@ gunicorn>=21.0.0
 # Image Processing
 Pillow>=10.0.0
 
+# PDF Processing
+PyMuPDF>=1.23.0  # Primary: Fast and reliable PDF-to-image conversion
+pdf2image>=1.16.0  # Fallback: Alternative PDF-to-image (requires poppler)
+
 # Utilities
 python-dotenv>=1.0.0

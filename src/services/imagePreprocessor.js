@@ -53,9 +53,11 @@ class ImagePreprocessor {
       // This is the SECRET WEAPON for handling shadows and uneven lighting
       enhanced = enhanced.threshold(128, { greyscale: false });
       
-      // Stage 7: Super-resolution upscaling (small images → 3000px)
-      const targetSize = options.targetSize || 3000;
-      const shouldUpscale = metadata.width < targetSize || metadata.height < targetSize;
+      // Stage 7: Smart upscaling (only for very small images)
+      const targetSize = options.targetSize || 2000; // Reduced from 3000 to prevent token overflow
+      const minSizeForUpscaling = 1000; // Only upscale if smaller than this
+      const shouldUpscale = (metadata.width < minSizeForUpscaling || metadata.height < minSizeForUpscaling) && 
+                           (metadata.width < targetSize || metadata.height < targetSize);
       
       if (shouldUpscale) {
         const scale = Math.max(

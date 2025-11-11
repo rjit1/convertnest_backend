@@ -17,6 +17,9 @@ const imageToPdfRoutes = require('./routes/imageToPdfRoutes');
 const utilityRoutes = require('./routes/utilityRoutes');
 const captionRoutes = require('./routes/captionRoutes');
 const imageToExcelRoutes = require('./routes/imageToExcel');
+const imageToTextRoutes = require('./routes/imageToText');
+const pdfToExcelRoutes = require('./routes/pdfToExcelRoutes');
+const textToSpeechRoutes = require('./routes/textToSpeechRoutes');
 
 // Initialize Express app
 const app = express();
@@ -39,7 +42,18 @@ app.use(cors({
     }
   },
   credentials: true,
-  exposedHeaders: ['X-Processing-Time', 'X-Extraction-Method', 'X-Table-Preview', 'Content-Disposition']
+  exposedHeaders: [
+    'X-Processing-Time', 
+    'X-Extraction-Method', 
+    'X-Table-Preview', 
+    'Content-Disposition',
+    'X-Total-Pages',
+    'X-Successful-Pages',
+    'X-Failed-Pages',
+    'X-Daily-Quota-Used',
+    'X-Daily-Quota-Limit',
+    'X-Daily-Quota-Remaining'
+  ]
 }));
 
 // Security middleware (MUST be after CORS)
@@ -82,6 +96,9 @@ app.use('/api/currency', currencyRoutes);
 app.use('/api', imageToPdfRoutes);
 app.use('/api', captionRoutes);
 app.use('/api', imageToExcelRoutes);
+app.use('/api/image-to-text', imageToTextRoutes);
+app.use('/api', pdfToExcelRoutes);
+app.use('/api', textToSpeechRoutes);
 app.use('/api', utilityRoutes);
 
 // Root endpoint
@@ -93,12 +110,18 @@ app.get('/', (req, res) => {
     endpoints: {
       pdfToWord: 'POST /api/pdf-to-word',
       pdfInfo: 'POST /api/pdf-info',
+      pdfToExcel: 'POST /api/pdf-to-excel/convert',
+      pdfToExcelInfo: 'POST /api/pdf-to-excel/info',
       mergePdfs: 'POST /api/merge-pdfs',
       splitPdf: 'POST /api/split-pdf',
       reorderPdf: 'POST /api/reorder-pdf',
       imageToPdf: 'POST /api/image-to-pdf',
       imageToExcel: 'POST /api/image-to-excel/convert',
       captionGenerator: 'POST /api/caption-generator',
+      textToSpeech: 'POST /api/text-to-speech/generate',
+      textToSpeechDialog: 'POST /api/text-to-speech/generate-dialog',
+      ttsVoices: 'GET /api/text-to-speech/voices',
+      ttsLanguages: 'GET /api/text-to-speech/languages',
       health: 'GET /api/health',
       stats: 'GET /api/stats'
     },
