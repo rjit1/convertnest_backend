@@ -272,7 +272,7 @@ async function generateCaption(mediaFile, userContext, settings) {
     // Generate content
     logger.debug('Calling Gemini generateContent API...');
     const result = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
+      model: 'gemini-2.5-flash', // Changed from gemini-2.0-flash-exp to use paid tier
       contents: [
         { text: prompt },
         { fileData: { mimeType: uploadedFile.mimeType, fileUri: uploadedFile.uri } }
